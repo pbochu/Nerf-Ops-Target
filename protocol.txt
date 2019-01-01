@@ -1,0 +1,29 @@
+protocol.txt
+
+The IR reception is handled by a Sony SBX 1620-52 device on my project, but any standard
+device detecting a 38 Khz signal should do.
+The project has been tested on a Nano and on a Uno board (16 Mhz)
+
+The only tag decoded is the one conveying the shooter color (BLUE, RED or PURPLE).
+Note: I only bothered to decode the tag received when no bluetooth pairing is set!
+
+When decoded with the Sony device, the tag is composed of
+- the header:
+  a 3 ms high level on the IR decoder data pin
+  a 6 ms low level on the IR decoder data pin
+  a 3 ms high level on the IR decoder data pin
+- 16 bits (left to right): each bit is composed of
+  a 2 ms low level
+  a 1 ms or a 2 ms high level: 1ms for a 0 / 2 ms for a 1
+
+After my own observations, the 16 bits are as follows (leftmost bit is first bit received):
+0000 1000 1000 0000 if shot by a PURPLE player
+0000 1000 0000 0000 if shot by a RED player
+0000 1000 0100 0000 if shot by a BLUE player
+
+In poc.ino I simply detect successively the 3 header markers and the 16 data bits,
+discarding the whole frame if an unexpected timing is measured. Then, the final 16 bit word
+is compared to the 3 possible values to identify the shooter color. Again, the frame is
+discarded if it does not match one of the 3 values.
+As for the timings, a large range is allowed (+/- 500 µs).
+
