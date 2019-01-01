@@ -1,0 +1,8 @@
+// Nerf-Ops-Target - README
+//
+// This is meant to be an easy-to-use Arduino library for detecting "laser" shots from Nerf Ops Alphapoint or Deltaburst guns
+//
+// First file : Proof Of Concept poc.ino
+// simply reads the IR signal from a Sony SBX 1620-52 receiver, decodes the relevant tag and prints out the sender color
+// on the serial port
+//
