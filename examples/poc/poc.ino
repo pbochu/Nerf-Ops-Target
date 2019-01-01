@@ -2,7 +2,6 @@
 // Decodes the relevant tag received from the IR receiver and
 // prints out the sender color on the serial link
 
-#define BUFFER_LENGTH 16
 #define IRPIN 2           // data from SBX 1620-52
 #define LED   13
 #define NO_TEAM   0
@@ -61,9 +60,9 @@ void loop() {
       }
     } else {
       // tag is 16 bits long
-      // one bit corresponds to a 2ms positive pulse followed by
-      // - a 1ms negative pulse for 0
-      // - a 2ms negative pulse for 1
+      // one bit corresponds to a 2ms negative pulse followed by
+      // - a 1ms positive pulse for 0
+      // - a 2ms positive pulse for 1
       digitalWrite(LED, HIGH);
       if (currentState == LOW) {
         if (duration != 2) {
