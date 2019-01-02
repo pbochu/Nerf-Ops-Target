@@ -1,7 +1,8 @@
 // Proof of concept: Nerf Ops Pro Alphapoint target
 // Decodes the relevant tag received from the IR receiver and
 // prints out the sender color on the serial link
-
+  
+#define BUFFER_LENGTH 16
 #define IRPIN 2           // data from SBX 1620-52
 #define LED   13
 #define NO_TEAM   0
@@ -33,7 +34,7 @@ void gotShot(uint8_t team) {
   }
 }
 
-void loop() {
+void loop()  {
   static uint32_t previousTime = micros();
   currentState = digitalRead(IRPIN);
   if (currentState != previousState) {
@@ -79,11 +80,12 @@ void loop() {
           reset();
         }
         if (idx == 19) {
-          if (tag == 0x0880) {
+          // the last 2 bits change when the blaster is connected to the app: ignored
+          if ((tag & 0xFFFC) == 0x0880) {
             gotShot(NO_TEAM);
-          } else if (tag == 0x0800) {
+          } else if ((tag & 0xFFFC) == 0x0800) {
             gotShot(RED_TEAM);
-          } else if (tag == 0x0840) {
+          } else if ((tag & 0xFFFC) == 0x0840) {
             gotShot(BLUE_TEAM);
           }
           reset();
