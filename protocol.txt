@@ -5,7 +5,6 @@ device detecting a 38 Khz signal should do.
 The project has been tested on a Nano and on a Uno board (16 Mhz)
 
 The only tag decoded is the one conveying the shooter color (BLUE, RED or PURPLE).
-Note: I only bothered to decode the tag received when no bluetooth pairing is set!
 
 When decoded with the Sony device, the tag is composed of
 - the header:
@@ -16,10 +15,14 @@ When decoded with the Sony device, the tag is composed of
   a 2 ms low level
   a 1 ms or a 2 ms high level: 1ms for a 0 / 2 ms for a 1
 
-After my own observations, the 16 bits are as follows (leftmost bit is first bit received):
+After my own observations, the 16 bits are as follows (leftmost bit is first bit received)
+when the blaster is not connected to the app:
 0000 1000 1000 0000 if shot by a PURPLE player
 0000 1000 0000 0000 if shot by a RED player
 0000 1000 0100 0000 if shot by a BLUE player
+
+When the blaster is connected to the app, it seems that the two last bits change (player number?)
+so I decided to ignore these bits when decoding the tag.
 
 In poc.ino I simply detect successively the 3 header markers and the 16 data bits,
 discarding the whole frame if an unexpected timing is measured. Then, the final 16 bit word
