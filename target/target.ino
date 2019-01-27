@@ -30,6 +30,7 @@
 #define BLUE            1
 #define RED             2
 #define PURPLE          3
+#define GREEN           4
 
 IRsend irsend; // LED emitter on pin 3
 
@@ -40,21 +41,22 @@ uint8_t shooter = NONE;
 bool shot = false;
 bool shooting = false;
 
+void showColor(uint8_t color) {
+  digitalWrite(RED_LED_PIN, ((color == RED) || (color == PURPLE)) ? HIGH : LOW);
+  digitalWrite(BLUE_LED_PIN, ((color == BLUE) || (color == PURPLE)) ? HIGH : LOW);
+  digitalWrite(GREEN_LED_PIN, (color == GREEN) ? HIGH : LOW);
+}
+
 // shoot at a player as one of his legitimate opponent
 void shoot(uint8_t color) {
   uint8_t shooterColor = opponent[color];
+  // green flash when shooting back. Was first white, but I decided that green was more recognizable
+  showColor(GREEN);
   shooting = true;  // disable decoding in the interrupt vector to avoid decoding my own shot!
   irsend.sendRaw(IRTag[shooterColor], 35, 38);  // 35 int length tag, 38 KHz
   delay(250);
   shooting = false;
-  // green flash. Was first white, but I decided that green was more recognizable
-  // digitalWrite(BLUE_LED_PIN, HIGH);
-  // digitalWrite(RED_LED_PIN, HIGH);
-  digitalWrite(GREEN_LED_PIN, HIGH);
-  delay(250);
-  // digitalWrite(RED_LED_PIN, LOW);
-  // digitalWrite(BLUE_LED_PIN, LOW);
-  digitalWrite(GREEN_LED_PIN, LOW);
+  showColor(NONE);
 }
 
 // the target got shot by a legitimate attacker
@@ -173,28 +175,28 @@ void loop() {
   // delay(1000 * random(10, 20));
   target = random(4);      
   // activate target
-  if ((target == RED) || (target == PURPLE)) {
-    digitalWrite(RED_LED_PIN, HIGH);
-  }
-  if ((target == BLUE) || (target == PURPLE)) {
-    digitalWrite(BLUE_LED_PIN, HIGH);
-  }
-  while (i++ < 200) {
+  showColor(target);
+  while (i++ < 30) {
     s = shot;
     sr = shooter;
     shot = false;
-    delay(10);
+    delay(50);
     if (s) {
       // got shot
       if (sr == opponent[target]) {
         // by an opponent
         gotShot(target);
+        showColor(target);
       } else {
         // by someone else: I shoot back!
         shoot(sr);
+        showColor(target);
       }
       break;
     }
+  }
+  while (i++ < 30) {
+    delay(50);
   }
   // deactivate target
   digitalWrite(RED_LED_PIN, LOW);
